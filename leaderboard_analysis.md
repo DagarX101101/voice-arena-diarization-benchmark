@@ -106,7 +106,7 @@ The General Leaderboard evaluates performance across all three categories and al
 - Handled by `assign_ranks()` in [`Scoring/scoring_utils.py:625-654`](file:///c:/Users/mrdag/OneDrive/Desktop/Task1%20Josh%20talks/Scoring/scoring_utils.py#L625-L654).
 - **Primary Ranking Key:** `custom_score` (higher is better).
 - **Tie-Break Handling:** Competition ranking (1224 / "min" ranking). If two models have identical custom scores, they receive the exact same rank integer. The next model's rank skips by the number of tied models (e.g., ties at rank 2 result in ranks `[1, 2, 2, 4]`).
-- **Unevaluated Models:** Models with `custom_score = None` receive `overall_rank = None` (displayed as blank in CSV).
+- **Missing Score Handling:** Models with `custom_score = None` receive `overall_rank = None` (displayed as blank in CSV).
 - **Table Sorting:** Ranked models appear first (sorted ascending by `overall_rank`), followed by unranked models (sorted ascending by `model_number`).
 
 ---

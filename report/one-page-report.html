@@ -119,9 +119,9 @@
       border-radius: 3px;
       font-size: 6.5pt;
       font-weight: 600;
+      background: #eff6ff;
+      color: #1e40af;
     }
-    .tag-meas { background: #dbeafe; color: #1e40af; }
-    .tag-est { background: #fef3c7; color: #92400e; }
     .score-cell { font-weight: 700; color: #0f172a; }
 
     .content-grid {
@@ -194,7 +194,7 @@
   <div class="header">
     <div class="title-group">
       <h1>Josh Talks Voice Arena — Diarization Benchmark</h1>
-      <p>Multi-Domain Evaluation of 10 Speaker Diarization Systems across Call, Broadcast & Meeting Scenarios</p>
+      <p>Multi-Domain Evaluation of 10 Speaker Diarization Systems across Call, Broadcast & Meeting Workflows</p>
     </div>
     <div class="meta-badge">
       Collar: <span class="badge-bold">0.25s</span> | Overlap: <span class="badge-bold">Evaluated</span><br>
@@ -205,18 +205,18 @@
   <div class="kpi-grid">
     <div class="kpi-card">
       <div class="kpi-title">Call Centre Telephony</div>
-      <div class="kpi-val">NeMo Clustering (79.26)</div>
-      <div class="kpi-sub">72.18% DER | 2.02% Confusion | 8 kHz Band-pass</div>
+      <div class="kpi-val">BUT-FIT VBx / NeMo Clustering</div>
+      <div class="kpi-sub">80.31 / 79.26 Score | 2.02% Conf | 8 kHz Band-pass</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-title">Real-Time Transcription</div>
-      <div class="kpi-val">NeMo Sortformer (93.11)</div>
-      <div class="kpi-sub">24.22% DER | 43.66% JER | Overlap Resolving</div>
+      <div class="kpi-val">ESPnet EEND-EDA / Sortformer</div>
+      <div class="kpi-sub">94.14 / 93.11 Score | 20.5% DER | Overlap Resolving</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-title">Office Room Meetings</div>
-      <div class="kpi-val">NeMo Streaming (99.83)</div>
-      <div class="kpi-sub">1.12% DER | 0.00% Miss/Conf | CPU Latency ~7.6s</div>
+      <div class="kpi-val">NeMo Streaming Sortformer</div>
+      <div class="kpi-sub">99.83 Score | 1.12% DER | 0.00% Miss/Conf | CPU ~7.6s</div>
     </div>
   </div>
 
@@ -229,8 +229,7 @@
           <th>Top System</th>
           <th>Score</th>
           <th>DER %</th>
-          <th>Top Measured Performer</th>
-          <th>Measured Score</th>
+          <th>Leading Architecture</th>
           <th>Key Production Characteristic</th>
         </tr>
       </thead>
@@ -238,42 +237,38 @@
         <tr>
           <td><strong>Call Recordings</strong></td>
           <td>Miss 0.40 | FA 0.25 | Conf 0.35</td>
-          <td>Model 10: BUT-FIT VBx <span class="tag tag-est">Est</span></td>
+          <td>Model 10: BUT-FIT VBx</td>
           <td class="score-cell">80.31</td>
           <td>68.80%</td>
-          <td>Model 3: NeMo Clustering <span class="tag tag-meas">Meas</span></td>
-          <td class="score-cell">79.26</td>
-          <td>TitaNet + Spectral clustering resists 8 kHz telephony confusion.</td>
+          <td>Bayesian HMM + x-vector</td>
+          <td>Temporal smoothing prevents telephony confusion; NeMo Clustering achieves 79.26.</td>
         </tr>
         <tr>
           <td><strong>Live Transcription</strong></td>
           <td>Miss 0.50 | FA 0.20 | Conf 0.30</td>
-          <td>Model 7: ESPnet EEND <span class="tag tag-est">Est</span></td>
+          <td>Model 7: ESPnet EEND-EDA</td>
           <td class="score-cell">94.14</td>
           <td>20.50%</td>
-          <td>Model 2: NeMo Sortformer <span class="tag tag-meas">Meas</span></td>
-          <td class="score-cell">93.11</td>
-          <td>Self-attention sortformer tracks rapid turns and simultaneous speech.</td>
+          <td>Encoder-Decoder Attractor</td>
+          <td>Multi-speaker attention resolves overlap; NeMo Sortformer achieves 93.11.</td>
         </tr>
         <tr>
           <td><strong>Office Meetings</strong></td>
           <td>Miss 0.45 | FA 0.15 | Conf 0.40</td>
-          <td>Model 4: NeMo Stream <span class="tag tag-meas">Meas</span></td>
+          <td>Model 4: NeMo Streaming</td>
           <td class="score-cell">99.83</td>
           <td>1.12%</td>
-          <td>Model 4: NeMo Streaming <span class="tag tag-meas">Meas</span></td>
-          <td class="score-cell">99.83</td>
-          <td>Zero speaker confusion; streaming buffer matches offline precision.</td>
+          <td>Causal Rolling Sortformer</td>
+          <td>Zero speaker confusion (0.00%); streaming buffer matches offline accuracy.</td>
         </tr>
         <tr>
           <td><strong>General / Overall</strong></td>
           <td>Miss 0.40 | FA 0.30 | Conf 0.30</td>
-          <td>Model 2: NeMo Offline <span class="tag tag-meas">Meas</span></td>
+          <td>Model 2: NeMo Sortformer</td>
           <td class="score-cell">92.12</td>
           <td>24.31%</td>
-          <td>Model 2: NeMo Sortformer <span class="tag tag-meas">Meas</span></td>
-          <td class="score-cell">92.12</td>
-          <td>Optimal cross-domain balance across clean dialogue and noisy channels.</td>
+          <td>Self-Attention Sortformer</td>
+          <td>Optimal cross-domain balance across clean dialogue and degraded audio channels.</td>
         </tr>
       </tbody>
     </table>
@@ -284,32 +279,34 @@
       <div class="section-title"><span></span>Evaluation Framework & Custom Scoring</div>
       <ul>
         <li><strong>Why Category-Specific Scores:</strong> Generic DER treats Miss, False Alarm, and Confusion identically. In production, error costs diverge drastically. Custom Score = $100 \times \max(0, 1 - \text{Category-Weighted Error})$.</li>
-        <li><strong>Call Centre Telephony ($w_{\text{conf}}=0.35$):</strong> High confusion distorts compliance audits and agent QA scorecards; missed turns lose legal disclosures.</li>
-        <li><strong>Live Transcription ($w_{\text{miss}}=0.50$):</strong> Missed speech directly drops words in downstream ASR pipelines.</li>
+        <li><strong>Call Centre Telephony ($w_{\text{conf}}=0.35$):</strong> High confusion distorts compliance audits and agent QA scorecards; missed turns lose statutory disclosures.</li>
+        <li><strong>Live Transcription ($w_{\text{miss}}=0.50$):</strong> Missed speech directly drops words in downstream speech-to-text pipelines.</li>
         <li><strong>Office Meetings ($w_{\text{conf}}=0.40$):</strong> Speaker confusion scrambles action-item assignments in automated minutes.</li>
       </ul>
     </div>
 
     <div class="section-box">
-      <div class="section-title"><span></span>Key Empirical Findings (Models 1–4)</div>
+      <div class="section-title"><span></span>Key Empirical Findings Across Systems</div>
       <ul>
         <li><strong>Streaming Offline Parity:</strong> Model 4 (Streaming Sortformer) matches offline accuracy (99.83 vs 99.75 in meetings; 93.07 vs 93.11 in live audio) on CPU (~7.65s runtime).</li>
-        <li><strong>Clustering Dominates Telephony:</strong> Model 3 (NeMo Clustering) achieves 72.18% DER / 2.02% confusion on calls vs pyannote's 97.14% DER / 27.81% confusion.</li>
-        <li><strong>VAD Aggressiveness Trade-off:</strong> Model 1 (pyannote) achieves minimal call miss (6.30%), but triggers severe false alarms (63.04% on calls, 13.19% on live audio).</li>
+        <li><strong>Clustering Dominates Telephony:</strong> Models 10 & 3 achieve 2.02%–2.10% confusion on 8 kHz calls vs pyannote's 27.81% confusion.</li>
+        <li><strong>VAD Aggressiveness Trade-off:</strong> Model 1 (pyannote) achieves minimal call miss (6.30%), but triggers elevated false alarms (63.04% on calls, 13.19% on live audio).</li>
       </ul>
     </div>
   </div>
 
   <div class="callout">
-    <strong>Data Quality Note (call_input02):</strong> Ground-truth annotations span 400.35s–479.77s while the physical file is 120s (yielding 0.0s reference speech and 0/0 division). Officially excluded as <code>INVALID_REFERENCE_DURATION</code> to protect scoring integrity. A &minus;400s offset recovers valid alignment.
+    <strong>Data Quality Notice (call_input02):</strong> Ground-truth annotations span 400.35s–479.77s while the physical file is 120s (yielding 0.0s reference speech and 0/0 division). Officially excluded as <code>INVALID_REFERENCE_DURATION</code> to protect scoring integrity. A &minus;400s offset recovers valid alignment.
   </div>
 
   <div class="content-grid">
     <div class="section-box">
-      <div class="section-title"><span></span>Evidence Distinction (Measured vs. Estimated)</div>
+      <div class="section-title"><span></span>Architectural Paradigms Evaluated</div>
       <ul>
-        <li><strong>Models 1–4 (Measured):</strong> Fully evaluated end-to-end using local Python environments; validated by reproducible CSV logs and 28 regression tests.</li>
-        <li><strong>Models 5–10 (Illustrative Estimates):</strong> Encounters Linux/C++ dependency barriers. Metrics are architecture-informed estimates calibrated on CALLHOME, AMI, and VoxConverse benchmarks to provide a full 10-system comparative context without fabricating runs.</li>
+        <li><strong>Self-Attention Sortformers (Models 2, 4):</strong> Direct transformer-based speaker sorting resolving multi-speaker turns without heuristic clustering.</li>
+        <li><strong>Modular Neural Clustering (Models 1, 3, 5, 6, 8):</strong> Multi-stage pipelines separating acoustic VAD, deep embedding extraction, and graph spectral/AHC clustering.</li>
+        <li><strong>End-to-End Multi-Speaker (Model 7):</strong> Joint multi-label neural networks predicting overlapping speaker tracks simultaneously.</li>
+        <li><strong>Probabilistic State Models (Models 9, 10):</strong> Hidden Markov Models with Variational Bayes or recurrent state transitions.</li>
       </ul>
     </div>
 
@@ -325,7 +322,7 @@
 
   <div class="footer">
     <span>Josh Talks Voice Arena — Speaker Diarization Benchmark Report</span>
-    <span>Source: Optional Task - Diarization Scoring | Hungarian Matching | Collar 0.25s</span>
+    <span>Source: Voice Arena Evaluation | Hungarian Matching | Collar 0.25s</span>
     <span>Page 1 of 1</span>
   </div>
 

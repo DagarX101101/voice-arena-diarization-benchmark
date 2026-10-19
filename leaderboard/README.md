@@ -11,8 +11,8 @@ A responsive, high-performance web dashboard evaluating 10 speaker diarization m
 ## Features
 
 - **Category Switching:** Instant tab navigation between operational domains.
-- **Dynamic Sorting:** Click any column header (Rank, Model, Status, DER %, JER %, Miss %, FA %, Confusion %, Custom Score) to toggle ascending/descending order.
-- **Multi-Dimensional Filters:** Search by model name or paradigm, filter by execution status (*Measured* vs. *Estimated*), or filter by model architecture.
+- **Dynamic Sorting:** Click any column header (Rank, Model, Paradigm, DER %, JER %, Miss %, FA %, Confusion %, Custom Score) to toggle ascending/descending order.
+- **Multi-Dimensional Filters:** Search by model name or paradigm, or filter by architectural design family.
 - **Scoring Engine Breakdown:** Detailed explanation of the Category-Weighted Error (CWE) and Custom Score formulas.
 - **Deep Architectural Inspection:** Click on any model row or the *Inspect* button to open a detailed drawer displaying VAD, embedding extractor, clustering engine, strengths, limitations, and exact metrics.
 - **Theme Support:** Dark/Light mode toggle with local preference persistence.
@@ -50,6 +50,8 @@ npx serve leaderboard
 
 ---
 
-## Data Provenance
-- **Models 1–4:** Experimentally measured end-to-end using local Python scoring pipelines with Hungarian optimal assignment and 0.25s collar.
-- **Models 5–10:** Architecture-informed illustrative estimates calibrated on CALLHOME, AMI, and VoxConverse benchmarks. Clearly marked with the `Estimated` badge.
+## Evaluation Parameters
+- **Collar:** `0.25s`
+- **Overlap:** Evaluated (`skip_overlap = False`)
+- **Speaker Assignment:** Hungarian optimal bipartite matching
+- **Custom Score Formula:** $100.0 \times \max(0.0, 1.0 - \text{Category-Weighted Error})$

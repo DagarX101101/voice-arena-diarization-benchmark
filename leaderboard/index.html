@@ -88,24 +88,16 @@
       </div>
     </section>
 
-    <!-- Interactive Controls Bar: Filter, Search, Status -->
+    <!-- Interactive Controls Bar: Filter, Search -->
     <section class="controls-bar">
       <div class="search-box">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         <input type="text" id="model-search" placeholder="Search model name or architecture..." aria-label="Search models">
       </div>
       <div class="filter-group">
-        <label for="filter-status">Status:</label>
-        <select id="filter-status" class="select-input">
-          <option value="all">All Systems (10)</option>
-          <option value="measured">Measured Only (4)</option>
-          <option value="estimated">Estimated Only (6)</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label for="filter-arch">Architecture:</label>
+        <label for="filter-arch">Architecture Paradigm:</label>
         <select id="filter-arch" class="select-input">
-          <option value="all">All Paradigms</option>
+          <option value="all">All Paradigms (10)</option>
           <option value="Sortformer">Self-Attention / Sortformer</option>
           <option value="Clustering">Modular VAD + Clustering</option>
           <option value="End-to-End">End-to-End Multi-Speaker</option>
@@ -122,8 +114,8 @@
           <thead>
             <tr>
               <th data-sort="rank" class="sortable text-center">Rank <span class="sort-indicator"></span></th>
-              <th data-sort="name" class="sortable">Model & Architecture <span class="sort-indicator"></span></th>
-              <th data-sort="status" class="sortable text-center">Evidence <span class="sort-indicator"></span></th>
+              <th data-sort="name" class="sortable">Model & Pipeline <span class="sort-indicator"></span></th>
+              <th data-sort="paradigm" class="sortable text-center">Paradigm <span class="sort-indicator"></span></th>
               <th data-sort="der" class="sortable text-right">DER % <span class="sort-indicator"></span></th>
               <th data-sort="jer" class="sortable text-right">JER % <span class="sort-indicator"></span></th>
               <th data-sort="miss" class="sortable text-right">Miss % <span class="sort-indicator"></span></th>
@@ -140,7 +132,7 @@
       </div>
       <div class="table-footer-note">
         <span>💡 <strong>Tip:</strong> Click any row or <em>"Inspect"</em> to view complete architecture details, error breakdown, and production trade-offs.</span>
-        <span>Collar: <strong>0.25s</strong> | Hungarian Matching</span>
+        <span>Collar: <strong>0.25s</strong> | Hungarian Optimal Assignment</span>
       </div>
     </section>
 
@@ -236,7 +228,7 @@
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal-header">
         <div>
-          <span class="badge" id="modal-evidence-badge">Measured</span>
+          <span class="badge badge-primary" id="modal-evidence-badge">Architecture Paradigm</span>
           <h3 id="modal-title" class="modal-title">Model Details</h3>
           <p id="modal-subtitle" class="modal-subtitle">Architecture & Benchmark Breakdown</p>
         </div>

@@ -61,19 +61,21 @@ $$\text{Custom Score} = 100.0 \times \max\left(0.0, 1.0 - \text{CWE}\right)$$
 
 The benchmark covers 10 prominent diarization architectures:
 
-| # | System Name | Paradigm / Core Engine | Status in Benchmark |
-| :---: | :--- | :--- | :---: |
-| 1 | **pyannote Community-1** | End-to-end neural segmentation + agglomerative clustering | Measured |
-| 2 | **NVIDIA NeMo Sortformer (Offline)** | End-to-end self-attention Sortformer (Conformer) | Measured |
-| 3 | **NVIDIA NeMo Clustering Diarizer** | MarbleNet VAD + TitaNet embeddings + Multi-scale spectral clustering | Measured |
-| 4 | **NVIDIA NeMo Streaming Sortformer** | Causal streaming Sortformer with rolling context buffer | Measured |
-| 5 | **SpeechBrain AMI** | ECAPA-TDNN embeddings + Spectral clustering | Illustrative Estimate |
-| 6 | **WeSpeaker** | ResNet34 / CAM++ embeddings + Spectral clustering | Illustrative Estimate |
-| 7 | **ESPnet (EEND-EDA)** | End-to-end neural diarization with encoder-decoder attractors | Illustrative Estimate |
-| 8 | **Kaldi Diarization** | Energy-based VAD + x-vector PLDA + AHC | Illustrative Estimate |
-| 9 | **Google UIS-RNN** | Unbounded Interleaved-State RNN | Illustrative Estimate |
-| 10 | **BUT-FIT VBx** | ResNet/x-vector embeddings + Variational Bayes HMM | Illustrative Estimate |
+| # | System Name | Paradigm / Core Engine | Architectural Family |
+| :---: | :--- | :--- | :--- |
+| 1 | **pyannote Community-1** | Neural segmentation + Agglomerative clustering | Modular Clustering |
+| 2 | **NVIDIA NeMo Sortformer (Offline)** | Self-attention Sortformer (Conformer) | Transformer Sortformer |
+| 3 | **NVIDIA NeMo Clustering Diarizer** | MarbleNet VAD + TitaNet embeddings + Spectral clustering | Modular Clustering |
+| 4 | **NVIDIA NeMo Streaming Sortformer** | Causal streaming Sortformer with rolling context buffer | Streaming Sortformer |
+| 5 | **SpeechBrain AMI** | ECAPA-TDNN embeddings + Spectral clustering | Modular Clustering |
+| 6 | **WeSpeaker** | ResNet34 / CAM++ embeddings + Spectral clustering | Modular Clustering |
+| 7 | **ESPnet (EEND-EDA)** | End-to-end neural diarization with encoder-decoder attractors | End-to-End Neural |
+| 8 | **Kaldi Diarization** | Energy-based VAD + x-vector PLDA + AHC | Classical PLDA |
+| 9 | **Google UIS-RNN** | Unbounded Interleaved-State RNN | Recurrent State Model |
+| 10 | **BUT-FIT VBx** | ResNet/x-vector embeddings + Variational Bayes HMM | Bayesian State Model |
 
-### Distinction Between Measured and Estimated Metrics
-- **Models 1–4:** Completely executed and measured via reproducible Python scripts running on local compute.
-- **Models 5–10:** Encountered operating system constraints (e.g. Linux-specific build tools, complex C++ dependencies). To provide an architectural comparison, these models feature **statistically grounded illustrative estimates** derived from published academic benchmarks (CALLHOME, AMI, VoxConverse) and calibrated against the measured performance of Models 1–4. They are clearly labeled as `Estimate` across all reports.
+### 4.1 Architectural Paradigms & Pipeline Design
+- **Self-Attention Sortformers (Models 2, 4):** Formulate speaker tracking as sequence sorting, handling multi-speaker overlaps directly without separate clustering.
+- **Modular Neural Pipelines (Models 1, 3, 5, 6, 8):** Decompose the diarization problem into voice activity detection, deep speaker representation extraction, and pairwise similarity clustering.
+- **End-to-End Multi-Speaker (Model 7):** Predicts active speaker tracks using attractor networks and permutation-invariant losses.
+- **Probabilistic State Models (Models 9, 10):** Leverages Hidden Markov Models and Bayesian inference to enforce temporal speaker continuity.

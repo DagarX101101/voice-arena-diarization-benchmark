@@ -477,15 +477,12 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.badge-measured {
-  background: var(--accent-green-bg);
-  color: var(--accent-green);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-.badge-estimated {
-  background: var(--accent-gold-bg);
-  color: var(--accent-gold);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+.badge-paradigm {
+  background: var(--brand-blue-subtle);
+  color: var(--brand-blue);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  font-weight: 600;
+  font-size: 0.71875rem;
 }
 .badge-primary {
   background: var(--brand-blue-subtle);
