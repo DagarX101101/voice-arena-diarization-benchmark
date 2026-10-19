@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Arena — Enterprise Speaker Diarization Benchmark</title>
+  <meta name="description" content="Product-style SaaS leaderboard sketch comparing 10 speaker diarization models across call centre, real-time transcription, and office meeting domains.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Color Tokens */
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f1f5f9;
+      --bg-hover: #f8fafc;
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+
+      --text-main: #0f172a;
+      --text-body: #334155;
+      --text-muted: #64748b;
+
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-subtle: #eff6ff;
+      --primary-border: #bfdbfe;
+
+      --gold: #d97706;
+      --gold-bg: #fef3c7;
+      --gold-border: #fde68a;
+
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --purple: #7c3aed;
+      --purple-bg: #f5f3ff;
+      --red: #dc2626;
+
+      --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 10px 20px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+      --shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0b0f19;
+      --bg-card: #111827;
+      --bg-card-subtle: #1e293b;
+      --bg-hover: #1e293b;
+      --border-subtle: #1f2937;
+      --border-strong: #374151;
+
+      --text-main: #f8fafc;
+      --text-body: #cbd5e1;
+      --text-muted: #94a3b8;
+
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --primary-subtle: #1e293b;
+      --primary-border: #2563eb;
+
+      --gold: #f59e0b;
+      --gold-bg: #451a03;
+      --gold-border: #78350f;
+
+      --green: #10b981;
+      --green-bg: #064e3b;
+      --purple: #a855f7;
+      --purple-bg: #2e1065;
+
+      --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 10px 20px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-body);
+      color: var(--text-body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 3rem;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .nav-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0.875rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+    .brand-logo-badge {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      color: white;
+      font-weight: 800;
+      font-size: 0.8125rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.05em;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+    .brand-info h1 {
+      font-size: 1.1875rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+    .brand-info p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.45rem 0.875rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-body);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+
+    /* Page Container */
+    .app-layout {
+      max-width: 1320px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Hero / Description Card */
+    .hero-banner {
+      background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-subtle) 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-card);
+    }
+    .hero-text { flex: 1; min-width: 320px; }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      background: var(--primary-subtle);
+      border: 1px solid var(--primary-border);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 0.5rem;
+    }
+    .hero-text h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.025em;
+      margin-bottom: 0.35rem;
+    }
+    .hero-text p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      line-height: 1.5;
+    }
+    .eval-spec-badge {
+      display: flex;
+      gap: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+    }
+    .eval-spec-item strong { display: block; color: var(--text-main); font-size: 0.875rem; font-family: var(--font-mono); }
+    .eval-spec-item span { color: var(--text-muted); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Summary Stat Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.125rem 1.25rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--primary);
+    }
+    .stat-card.card-champion::before { background: var(--gold); }
+    .stat-card.card-score::before { background: var(--green); }
+    .stat-card.card-scale::before { background: var(--purple); }
+
+    .stat-label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .stat-value {
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .stat-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Category Segmented Tabs */
+    .view-selector-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.625rem;
+      box-shadow: var(--shadow-card);
+    }
+    .segment-tabs {
+      display: flex;
+      gap: 0.375rem;
+      overflow-x: auto;
+    }
+    .segment-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 0.5rem 0.875rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .segment-tab:hover {
+      color: var(--text-main);
+      background: var(--bg-card-subtle);
+    }
+    .segment-tab.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+    .tab-counter {
+      font-size: 0.6875rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--radius-full);
+      background: rgba(0, 0, 0, 0.08);
+      font-weight: 700;
+    }
+    .segment-tab.active .tab-counter {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+    }
+
+    .category-weights-pill {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    .weight-tag {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+    }
+
+    /* Controls Bar: Search, Sort, Architecture Filter */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .search-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-input-wrap svg {
+      position: absolute;
+      left: 0.875rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.55rem 0.875rem 0.55rem 2.375rem;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-main);
+      outline: none;
+      box-shadow: var(--shadow-card);
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .ctrl-select {
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      padding: 0.55rem 0.875rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-main);
+      outline: none;
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+    }
+    .ctrl-select:focus { border-color: var(--primary); }
+
+    /* Product Leaderboard Table Card */
+    .product-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    .saas-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      text-align: left;
+    }
+    .saas-table thead th {
+      background: var(--bg-card-subtle);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .saas-table thead th.sortable { cursor: pointer; }
+    .saas-table thead th.sortable:hover { color: var(--primary); }
+    .saas-table thead th.active-sort { color: var(--primary); }
+
+    .saas-table tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.12s ease;
+      cursor: pointer;
+    }
+    .saas-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+    .saas-table tbody tr.rank-1-row {
+      background: rgba(217, 119, 6, 0.035);
+    }
+    [data-theme="dark"] .saas-table tbody tr.rank-1-row {
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .saas-table td {
+      padding: 0.875rem 1rem;
+      vertical-align: middle;
+    }
+
+    /* Rank Badges */
+    .rank-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      font-weight: 800;
+      font-size: 0.8125rem;
+      font-family: var(--font-mono);
+      background: var(--bg-card-subtle);
+      color: var(--text-main);
+    }
+    .rank-cell.gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
+    }
+    .rank-cell.silver {
+      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+      color: white;
+    }
+    .rank-cell.bronze {
+      background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+      color: white;
+    }
+
+    /* Model Name & Architecture Column */
+    .model-info-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .model-name-text {
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 0.875rem;
+    }
+    .model-paradigm-tag {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .paradigm-chip {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.65rem;
+      color: var(--text-body);
+    }
+
+    /* Score Cell & Progress Bar (What sits next to each score) */
+    .score-composite {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 140px;
+    }
+    .score-header-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .score-val {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    .score-val.top-champion {
+      color: var(--gold);
+    }
+    .score-badge {
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+    }
+    .badge-elite { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+    .badge-strong { background: var(--green-bg); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge-good { background: var(--primary-subtle); color: var(--primary); border: 1px solid var(--primary-border); }
+    .badge-std { background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+
+    .score-bar-track {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-card-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    .score-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: var(--radius-full);
+      transition: width 0.3s ease;
+    }
+    .score-bar-fill.fill-gold {
+      background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    /* Numbers & Metrics */
+    .mono-num {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--text-body);
+    }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+
+    /* Action Button */
+    .btn-inspect-mini {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-body);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-inspect-mini:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Table Footer */
+    .table-sub-footer {
+      padding: 0.875rem 1.25rem;
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Scoring Rationale Callout Card */
+    .scoring-formula-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-card);
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1.5rem;
+    }
+    .formula-explanation h3 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .formula-explanation p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+    .formula-badge-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+      display: inline-block;
+    }
+    .weights-table-mini table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    .weights-table-mini th {
+      background: var(--bg-card-subtle);
+      padding: 0.4rem 0.6rem;
+      text-align: left;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .weights-table-mini td {
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Modal / Drawer */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .drawer-overlay.active { display: flex; }
+    .drawer-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-modal);
+      animation: popIn 0.18s ease-out;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .drawer-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .drawer-title-group h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .drawer-title-group p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .btn-close-drawer {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+    .drawer-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .pipeline-step-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+    }
+    .pipeline-step-box h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .pipeline-item {
+      font-size: 0.8125rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .pipeline-item strong { min-width: 130px; color: var(--text-main); }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .insight-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.875rem;
+      font-size: 0.8125rem;
+    }
+    .insight-card strong {
+      display: block;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    /* Error Composition Stacked Bar */
+    .error-stack-wrap {
+      margin-top: 0.5rem;
+    }
+    .error-stack-bar {
+      display: flex;
+      height: 10px;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      background: var(--border-subtle);
+    }
+    .stack-segment { height: 100%; transition: width 0.3s ease; }
+    .seg-miss { background: #f97316; }
+    .seg-fa { background: #ef4444; }
+    .seg-conf { background: #8b5cf6; }
+    .error-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+    .legend-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-right: 0.25rem;
+    }
+
+    @media (max-width: 1024px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .controls-grid { grid-template-columns: 1fr; }
+      .scoring-formula-card { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .grid-2col { grid-template-columns: 1fr; }
+      .hero-banner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="top-nav">
+    <div class="nav-inner">
+      <div class="brand-group">
+        <span class="brand-logo-badge">VOICE ARENA</span>
+        <div class="brand-info">
+          <h1>Speaker Diarization Leaderboard</h1>
+          <p>Multi-Domain AI Voice Architecture Benchmark</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="../../report/one-page-report.pdf" target="_blank" class="nav-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          Executive PDF
+        </a>
+        <a href="../../docs/methodology.md" target="_blank" class="nav-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Methodology
+        </a>
+        <button id="theme-btn" class="nav-btn" title="Toggle Dark/Light Mode">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-layout">
+
+    <!-- Hero / Description Banner -->
+    <section class="hero-banner">
+      <div class="hero-text">
+        <div class="hero-pill">SaaS Product Mockup & Sketch</div>
+        <h2>Enterprise Speaker Diarization Benchmark</h2>
+        <p>
+          Comparative evaluation of 10 modern speaker diarization systems across telephony, high-overlap broadcast transcription, and executive meeting room acoustics. Systems are ranked by business-aligned <strong>Custom Score</strong>.
+        </p>
+      </div>
+      <div class="eval-spec-badge">
+        <div class="eval-spec-item">
+          <strong>0.25s</strong>
+          <span>Forgiveness Collar</span>
+        </div>
+        <div class="eval-spec-item">
+          <strong>Hungarian</strong>
+          <span>Speaker Mapping</span>
+        </div>
+        <div class="eval-spec-item">
+          <strong>Evaluated</strong>
+          <span>Overlap Mode</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary KPI Cards -->
+    <section class="summary-grid">
+      <div class="stat-card">
+        <div class="stat-label">Active Category</div>
+        <div class="stat-value" id="kpi-category-name">General / All-Purpose</div>
+        <div class="stat-meta" id="kpi-category-sub">4 Files • 445.3s Speech Pool</div>
+      </div>
+
+      <div class="stat-card card-champion">
+        <div class="stat-label">Category Champion</div>
+        <div class="stat-value" id="kpi-champion-name">Model 2: NeMo Sortformer</div>
+        <div class="stat-meta" id="kpi-champion-meta">Rank #1 • Highest Custom Score</div>
+      </div>
+
+      <div class="stat-card card-score">
+        <div class="stat-label">Top Custom Score</div>
+        <div class="stat-value" id="kpi-top-score">92.12 / 100</div>
+        <div class="stat-meta" id="kpi-top-score-meta">DER: 24.31% • Confusion: 0.65%</div>
+      </div>
+
+      <div class="stat-card card-scale">
+        <div class="stat-label">Evaluated Systems</div>
+        <div class="stat-value">10 Models</div>
+        <div class="stat-meta">4 Architecture Paradigms</div>
+      </div>
+    </section>
+
+    <!-- Category Segmented Control & Domain Weights -->
+    <section class="view-selector-bar">
+      <div class="segment-tabs" role="tablist">
+        <button class="segment-tab active" data-category="general" id="tab-general">
+          <span>🌐 General / All Models</span>
+          <span class="tab-counter">10</span>
+        </button>
+        <button class="segment-tab" data-category="call" id="tab-call">
+          <span>📞 Call Centre Telephony</span>
+          <span class="tab-counter">8 kHz</span>
+        </button>
+        <button class="segment-tab" data-category="realtime" id="tab-realtime">
+          <span>⚡ Real-Time Transcription</span>
+          <span class="tab-counter">Overlap</span>
+        </button>
+        <button class="segment-tab" data-category="meeting" id="tab-meeting">
+          <span>👥 Office Room Meetings</span>
+          <span class="tab-counter">Meetings</span>
+        </button>
+      </div>
+
+      <div class="category-weights-pill">
+        <span>Domain Weights:</span>
+        <span class="weight-tag">Miss: <strong id="w-miss-val">0.40</strong></span>
+        <span class="weight-tag">FA: <strong id="w-fa-val">0.30</strong></span>
+        <span class="weight-tag">Conf: <strong id="w-conf-val">0.30</strong></span>
+      </div>
+    </section>
+
+    <!-- Controls Bar: Search, Architecture Filter, Sort -->
+    <section class="controls-grid">
+      <div class="search-input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="filter-search" class="search-input" placeholder="Search by model name or keyword (e.g., NeMo, Sortformer, VBx)...">
+      </div>
+
+      <select id="filter-arch-select" class="ctrl-select">
+        <option value="all">All Architecture Paradigms (10)</option>
+        <option value="Sortformer">Self-Attention / Sortformer</option>
+        <option value="Clustering">Modular VAD + Clustering</option>
+        <option value="End-to-End">End-to-End Attractor</option>
+        <option value="Probabilistic">Probabilistic / Bayesian HMM</option>
+      </select>
+
+      <select id="sort-select" class="ctrl-select">
+        <option value="score_desc">Sort: Custom Score (High → Low)</option>
+        <option value="der_asc">Sort: DER % (Low → High)</option>
+        <option value="jer_asc">Sort: JER % (Low → High)</option>
+        <option value="miss_asc">Sort: Missed % (Low → High)</option>
+        <option value="fa_asc">Sort: False Alarm % (Low → High)</option>
+        <option value="conf_asc">Sort: Confusion % (Low → High)</option>
+      </select>
+
+      <button id="btn-reset" class="nav-btn">Reset</button>
+    </section>
+
+    <!-- Product-Style Main Table -->
+    <section class="product-table-card">
+      <div class="table-container">
+        <table class="saas-table" id="main-table">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 60px;">Rank</th>
+              <th>Model Name & Architecture</th>
+              <th style="min-width: 170px;">
+                Custom Score
+                <span title="Normalized score (0-100) combining Missed, False Alarm and Confusion errors based on domain business weights.">ℹ️</span>
+              </th>
+              <th class="text-right">DER %</th>
+              <th class="text-right">JER %</th>
+              <th class="text-right">Miss %</th>
+              <th class="text-right">FA %</th>
+              <th class="text-right">Confusion %</th>
+              <th class="text-center" style="width: 110px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-sub-footer">
+        <div>
+          <span>💡 <strong>What sits next to each score:</strong> A visual performance meter bar and categorical tier badge (<code>Elite</code> / <code>Strong</code> / <code>Good</code>) visualizing metric strength out of 100.</span>
+        </div>
+        <div>
+          <span>Click any row or <strong>"Inspect"</strong> to view full error composition breakdown.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scoring Engine Breakdown -->
+    <section class="scoring-formula-card">
+      <div class="formula-explanation">
+        <h3>📐 How the Custom Score is Calculated</h3>
+        <p>
+          Standard DER penalizes Missed Speech, False Alarms, and Speaker Confusion identically. In commercial audio systems, costs diverge: speaker confusion scrambles agent QA in call centres, while missed speech drops words in speech-to-text.
+        </p>
+        <div class="formula-badge-code">
+          Custom Score = 100.0 × max(0.0, 1.0 − Category-Weighted Error)
+        </div>
+      </div>
+
+      <div class="weights-table-mini">
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Miss ($w_{\text{m}}$)</th>
+              <th>FA ($w_{\text{fa}}$)</th>
+              <th>Conf ($w_{\text{c}}$)</th>
+              <th>Business Cost Focus</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Call Centre</strong></td>
+              <td>0.40</td>
+              <td>0.25</td>
+              <td>0.35</td>
+              <td>Attribution & QA compliance</td>
+            </tr>
+            <tr>
+              <td><strong>Real-Time</strong></td>
+              <td>0.50</td>
+              <td>0.20</td>
+              <td>0.30</td>
+              <td>Capturing all spoken words for ASR</td>
+            </tr>
+            <tr>
+              <td><strong>Office Meetings</strong></td>
+              <td>0.45</td>
+              <td>0.15</td>
+              <td>0.40</td>
+              <td>Action items & speaker identity</td>
+            </tr>
+            <tr>
+              <td><strong>General</strong></td>
+              <td>0.40</td>
+              <td>0.30</td>
+              <td>0.30</td>
+              <td>Macro cross-domain baseline</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Slide-Out Inspection Drawer / Modal -->
+  <div class="drawer-overlay" id="drawer-overlay">
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-model-name">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h3 id="drawer-model-name">Model Title</h3>
+          <p id="drawer-model-paradigm">Architecture Paradigm</p>
+        </div>
+        <button class="btn-close-drawer" id="btn-close-drawer">&times;</button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Error Breakdown Stacked Bar -->
+        <div class="pipeline-step-box">
+          <h4>Error Component Breakdown (Relative Duration)</h4>
+          <div class="error-stack-wrap">
+            <div class="error-stack-bar">
+              <div class="stack-segment seg-miss" id="bar-seg-miss" style="width: 30%;" title="Missed Speech"></div>
+              <div class="stack-segment seg-fa" id="bar-seg-fa" style="width: 45%;" title="False Alarm"></div>
+              <div class="stack-segment seg-conf" id="bar-seg-conf" style="width: 25%;" title="Speaker Confusion"></div>
+            </div>
+            <div class="error-legend">
+              <div><span class="legend-bullet seg-miss"></span>Missed: <strong id="lbl-seg-miss">0%</strong></div>
+              <div><span class="legend-bullet seg-fa"></span>False Alarm: <strong id="lbl-seg-fa">0%</strong></div>
+              <div><span class="legend-bullet seg-conf"></span>Confusion: <strong id="lbl-seg-conf">0%</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architectural Pipeline -->
+        <div class="pipeline-step-box">
+          <h4>Technical Architecture & Implementation</h4>
+          <div class="pipeline-item">
+            <strong>Voice Activity (VAD):</strong>
+            <span id="drawer-vad-text">-</span>
+          </div>
+          <div class="pipeline-item">
+            <strong>Speaker Embedding:</strong>
+            <span id="drawer-emb-text">-</span>
+          </div>
+          <div class="pipeline-item">
+            <strong>Clustering / Sorting:</strong>
+            <span id="drawer-cluster-text">-</span>
+          </div>
+        </div>
+
+        <!-- Strengths & Trade-offs -->
+        <div class="grid-2col">
+          <div class="insight-card">
+            <strong>Production Strengths</strong>
+            <p id="drawer-strengths-text">-</p>
+          </div>
+          <div class="insight-card">
+            <strong>Operational Trade-offs</strong>
+            <p id="drawer-tradeoffs-text">-</p>
+          </div>
+        </div>
+
+        <!-- Category Metrics Grid -->
+        <div class="pipeline-step-box">
+          <h4>Evaluation Metrics in Current View</h4>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; text-align: center; margin-top: 0.5rem;">
+            <div class="insight-card">
+              <strong>Custom Score</strong>
+              <div class="mono-num" style="font-size: 1.125rem; font-weight: 800; color: var(--primary);" id="drawer-score-val">-</div>
+            </div>
+            <div class="insight-card">
+              <strong>DER %</strong>
+              <div class="mono-num" style="font-size: 1.125rem; font-weight: 800;" id="drawer-der-val">-</div>
+            </div>
+            <div class="insight-card">
+              <strong>JER %</strong>
+              <div class="mono-num" style="font-size: 1.125rem; font-weight: 800;" id="drawer-jer-val">-</div>
+            </div>
+            <div class="insight-card">
+              <strong>Rank</strong>
+              <div class="mono-num" style="font-size: 1.125rem; font-weight: 800;" id="drawer-rank-val">-</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded Complete Dataset for all 10 Models
+    const MOCKUP_DATA = {
+      categories: {
+        general: {
+          id: "general",
+          name: "General / All-Purpose Leaderboard",
+          sub: "Macro Aggregate across 4 Canonical Files (445.3s Speech)",
+          weights: { miss: "0.40", fa: "0.30", conf: "0.30" },
+          models: [
+            { rank: 1, id: 2, name: "Model 2: NVIDIA NeMo Sortformer (Offline)", paradigm: "Neural Sortformer", arch: "Sortformer", score: 92.12, der: 24.31, jer: 43.15, miss: 9.38, fa: 14.28, conf: 0.65 },
+            { rank: 2, id: 4, name: "Model 4: NVIDIA NeMo Streaming Sortformer", paradigm: "Streaming Sortformer", arch: "Sortformer", score: 92.10, der: 25.84, jer: 41.22, miss: 8.52, fa: 16.63, conf: 0.69 },
+            { rank: 3, id: 10, name: "Model 10: BUT-FIT VBx", paradigm: "Bayesian HMM", arch: "Probabilistic", score: 91.90, der: 23.40, jer: 44.50, miss: 8.80, fa: 13.50, conf: 1.10 },
+            { rank: 4, id: 7, name: "Model 7: ESPnet (EEND-EDA)", paradigm: "End-to-End Attractor", arch: "End-to-End", score: 91.81, der: 22.80, jer: 41.00, miss: 9.50, fa: 12.00, conf: 1.30 },
+            { rank: 5, id: 1, name: "Model 1: pyannote Community-1", paradigm: "Segmentation + AHC", arch: "Clustering", score: 91.40, der: 26.29, jer: 58.26, miss: 7.08, fa: 15.35, conf: 3.86 },
+            { rank: 6, id: 5, name: "Model 5: SpeechBrain AMI", paradigm: "TDNN + Clustering", arch: "Clustering", score: 91.07, der: 26.50, jer: 49.00, miss: 9.80, fa: 14.50, conf: 2.20 },
+            { rank: 7, id: 6, name: "Model 6: WeSpeaker", paradigm: "ResNet + Clustering", arch: "Clustering", score: 90.61, der: 27.80, jer: 51.00, miss: 10.50, fa: 14.80, conf: 2.50 },
+            { rank: 8, id: 3, name: "Model 3: NVIDIA NeMo Clustering Diarizer", paradigm: "Spectral Clustering", arch: "Clustering", score: 90.52, der: 22.79, jer: 65.59, miss: 18.06, fa: 3.83, conf: 0.90 },
+            { rank: 9, id: 9, name: "Model 9: Google UIS-RNN", paradigm: "Interleaved-State RNN", arch: "Probabilistic", score: 88.95, der: 32.50, jer: 54.00, miss: 12.50, fa: 16.50, conf: 3.50 },
+            { rank: 10, id: 8, name: "Model 8: Kaldi Diarization", paradigm: "x-vector PLDA", arch: "Clustering", score: 88.27, der: 34.50, jer: 56.50, miss: 13.80, fa: 17.20, conf: 3.50 }
+          ]
+        },
+        call: {
+          id: "call",
+          name: "Call Centre / Call Recordings",
+          sub: "CALLHOME (call_input01, 8 kHz Telephony, 55.3s Speech)",
+          weights: { miss: "0.40", fa: "0.25", conf: "0.35" },
+          models: [
+            { rank: 1, id: 10, name: "Model 10: BUT-FIT VBx", paradigm: "Bayesian HMM", arch: "Probabilistic", score: 80.31, der: 68.80, jer: 58.50, miss: 15.20, fa: 51.50, conf: 2.10 },
+            { rank: 2, id: 3, name: "Model 3: NVIDIA NeMo Clustering Diarizer", paradigm: "Spectral Clustering", arch: "Clustering", score: 79.26, der: 72.18, jer: 64.90, miss: 16.64, fa: 53.52, conf: 2.02 },
+            { rank: 3, id: 7, name: "Model 7: ESPnet (EEND-EDA)", paradigm: "End-to-End Attractor", arch: "End-to-End", score: 75.87, der: 74.50, jer: 56.00, miss: 34.20, fa: 36.50, conf: 3.80 },
+            { rank: 4, id: 5, name: "Model 5: SpeechBrain AMI", paradigm: "TDNN + Clustering", arch: "Clustering", score: 75.28, der: 79.20, jer: 65.00, miss: 28.50, fa: 44.20, conf: 6.50 },
+            { rank: 5, id: 6, name: "Model 6: WeSpeaker", paradigm: "ResNet + Clustering", arch: "Clustering", score: 73.88, der: 82.40, jer: 67.50, miss: 31.80, fa: 43.10, conf: 7.50 },
+            { rank: 6, id: 2, name: "Model 2: NVIDIA NeMo Sortformer (Offline)", paradigm: "Neural Sortformer", arch: "Sortformer", score: 73.74, der: 77.89, jer: 61.73, miss: 44.16, fa: 32.05, conf: 1.68 },
+            { rank: 7, id: 4, name: "Model 4: NVIDIA NeMo Streaming Sortformer", paradigm: "Streaming Sortformer", arch: "Sortformer", score: 73.24, der: 80.67, jer: 49.60, miss: 42.49, fa: 36.03, conf: 2.15 },
+            { rank: 8, id: 1, name: "Model 1: pyannote Community-1", paradigm: "Segmentation + AHC", arch: "Clustering", score: 71.99, der: 97.14, jer: 78.71, miss: 6.30, fa: 63.04, conf: 27.81 },
+            { rank: 9, id: 9, name: "Model 9: Google UIS-RNN", paradigm: "Interleaved-State RNN", arch: "Probabilistic", score: 71.41, der: 89.50, jer: 71.50, miss: 35.50, fa: 45.10, conf: 8.90 },
+            { rank: 10, id: 8, name: "Model 8: Kaldi Diarization", paradigm: "x-vector PLDA", arch: "Clustering", score: 69.66, der: 95.20, jer: 74.00, miss: 36.80, fa: 48.20, conf: 10.20 }
+          ]
+        },
+        realtime: {
+          id: "realtime",
+          name: "Real-Time Conversations & Transcriptions",
+          sub: "Pooled: liveTranscription_input01 & 03 (282.0s Speech, Heavy Overlap)",
+          weights: { miss: "0.50", fa: "0.20", conf: "0.30" },
+          models: [
+            { rank: 1, id: 7, name: "Model 7: ESPnet (EEND-EDA)", paradigm: "End-to-End Attractor", arch: "End-to-End", score: 94.14, der: 20.50, jer: 39.50, miss: 4.80, fa: 12.50, conf: 3.20 },
+            { rank: 2, id: 2, name: "Model 2: NVIDIA NeMo Sortformer (Offline)", paradigm: "Neural Sortformer", arch: "Sortformer", score: 93.11, der: 24.22, jer: 43.66, miss: 5.41, fa: 14.59, conf: 4.22 },
+            { rank: 3, id: 4, name: "Model 4: NVIDIA NeMo Streaming Sortformer", paradigm: "Streaming Sortformer", arch: "Sortformer", score: 93.07, der: 26.06, jer: 41.86, miss: 4.26, fa: 17.43, conf: 4.37 },
+            { rank: 4, id: 10, name: "Model 10: BUT-FIT VBx", paradigm: "Bayesian HMM", arch: "Probabilistic", score: 93.00, der: 22.80, jer: 45.00, miss: 7.20, fa: 12.80, conf: 2.80 },
+            { rank: 5, id: 1, name: "Model 1: pyannote Community-1", paradigm: "Segmentation + AHC", arch: "Clustering", score: 92.75, der: 23.99, jer: 57.94, miss: 6.87, fa: 13.19, conf: 3.92 },
+            { rank: 6, id: 5, name: "Model 5: SpeechBrain AMI", paradigm: "TDNN + Clustering", arch: "Clustering", score: 92.32, der: 25.20, jer: 48.50, miss: 7.50, fa: 13.80, conf: 3.90 },
+            { rank: 7, id: 6, name: "Model 6: WeSpeaker", paradigm: "ResNet + Clustering", arch: "Clustering", score: 91.85, der: 26.50, jer: 50.00, miss: 8.10, fa: 14.20, conf: 4.20 },
+            { rank: 8, id: 3, name: "Model 3: NVIDIA NeMo Clustering Diarizer", paradigm: "Spectral Clustering", arch: "Clustering", score: 90.34, der: 21.38, jer: 64.51, miss: 17.32, fa: 2.18, conf: 1.88 },
+            { rank: 9, id: 9, name: "Model 9: Google UIS-RNN", paradigm: "Interleaved-State RNN", arch: "Probabilistic", score: 90.30, der: 30.80, jer: 53.50, miss: 10.20, fa: 15.80, conf: 4.80 },
+            { rank: 10, id: 8, name: "Model 8: Kaldi Diarization", paradigm: "x-vector PLDA", arch: "Clustering", score: 89.57, der: 32.50, jer: 55.00, miss: 11.50, fa: 16.20, conf: 4.80 }
+          ]
+        },
+        meeting: {
+          id: "meeting",
+          name: "Office Room Meetings",
+          sub: "meeting_input (VoxConverse zvmyn, 108.0s Speech, Presentation Dialogue)",
+          weights: { miss: "0.45", fa: "0.15", conf: "0.40" },
+          models: [
+            { rank: 1, id: 4, name: "Model 4: NVIDIA NeMo Streaming Sortformer", paradigm: "Streaming Sortformer", arch: "Sortformer", score: 99.83, der: 1.12, jer: 1.10, miss: 0.00, fa: 1.12, conf: 0.00 },
+            { rank: 2, id: 2, name: "Model 2: NVIDIA NeMo Sortformer (Offline)", paradigm: "Neural Sortformer", arch: "Sortformer", score: 99.75, der: 1.19, jer: 1.18, miss: 0.22, fa: 0.97, conf: 0.00 },
+            { rank: 3, id: 10, name: "Model 10: BUT-FIT VBx", paradigm: "Bayesian HMM", arch: "Probabilistic", score: 99.69, der: 1.25, jer: 1.25, miss: 0.35, fa: 0.85, conf: 0.05 },
+            { rank: 4, id: 7, name: "Model 7: ESPnet (EEND-EDA)", paradigm: "End-to-End Attractor", arch: "End-to-End", score: 99.66, der: 1.30, jer: 1.35, miss: 0.45, fa: 0.80, conf: 0.05 },
+            { rank: 5, id: 3, name: "Model 3: NVIDIA NeMo Clustering Diarizer", paradigm: "Spectral Clustering", arch: "Clustering", score: 99.60, der: 1.32, jer: 1.32, miss: 0.66, fa: 0.67, conf: 0.00 },
+            { rank: 6, id: 6, name: "Model 6: WeSpeaker", paradigm: "ResNet + Clustering", arch: "Clustering", score: 99.45, der: 1.85, jer: 1.90, miss: 0.85, fa: 0.95, conf: 0.05 },
+            { rank: 7, id: 5, name: "Model 5: SpeechBrain AMI", paradigm: "TDNN + Clustering", arch: "Clustering", score: 99.38, der: 2.10, jer: 2.10, miss: 0.95, fa: 1.05, conf: 0.10 },
+            { rank: 8, id: 1, name: "Model 1: pyannote Community-1", paradigm: "Segmentation + AHC", arch: "Clustering", score: 99.13, der: 2.50, jer: 2.48, miss: 1.33, fa: 0.80, conf: 0.38 },
+            { rank: 9, id: 9, name: "Model 9: Google UIS-RNN", paradigm: "Interleaved-State RNN", arch: "Probabilistic", score: 98.96, der: 3.40, jer: 3.20, miss: 1.60, fa: 1.60, conf: 0.20 },
+            { rank: 10, id: 8, name: "Model 8: Kaldi Diarization", paradigm: "x-vector PLDA", arch: "Clustering", score: 98.70, der: 4.10, jer: 3.80, miss: 2.10, fa: 1.80, conf: 0.20 }
+          ]
+        }
+      },
+      details: {
+        1: {
+          name: "pyannote Community-1",
+          paradigm: "End-to-End Neural Segmentation + Agglomerative Hierarchical Clustering",
+          vad: "Integrated multi-task neural segmentation (bimodal speech probabilities)",
+          embedding: "pyannote x-vector / SincNet convolutional speaker representations",
+          clustering: "Cosine-distance Agglomerative Hierarchical Clustering with threshold calibration",
+          strengths: "High VAD sensitivity detects faint speaker turns (6.30% call miss); ubiquitous HuggingFace ecosystem.",
+          tradeoffs: "Elevated false alarm rate on telephony (63.04%) and elevated speaker confusion (27.81%) on rapid alternating turns."
+        },
+        2: {
+          name: "NVIDIA NeMo Sortformer (Offline)",
+          paradigm: "End-to-End Neural Transformer Sortformer (Conformer-based)",
+          vad: "Joint self-attention multi-speaker segmentation (no separate VAD module)",
+          embedding: "Continuous frame representations sorted via transformer cross-attention",
+          clustering: "Attractor-based speaker sorting (eliminates pairwise clustering)",
+          strengths: "Top overall champion (92.12 macro score); near-zero confusion on clean meetings (0.00%) and calls (1.68%). Resolves overlap natively.",
+          tradeoffs: "Conservative speech boundary thresholds increase missed speech on low-volume 8 kHz telephone audio (44.16%)."
+        },
+        3: {
+          name: "NVIDIA NeMo Clustering Diarizer",
+          paradigm: "Modular Neural Diarizer (MarbleNet VAD + TitaNet + Multi-Scale Spectral)",
+          vad: "MarbleNet 8x4 acoustic voice activity detector (30ms frames)",
+          embedding: "TitaNet-Large 1D-depthwise separable convolutional speaker embeddings",
+          clustering: "Multi-scale normalized Laplacian spectral graph clustering with NME-SC eigen-gap estimation",
+          strengths: "Top performer on 8 kHz telephony (72.18% DER, 79.26 Score). Lowest speaker confusion (2.02%) and false alarms (2.18% on live).",
+          tradeoffs: "Strict VAD energy thresholds slightly elevate missed speech (17.32% on live); multi-scale clustering adds compute latency."
+        },
+        4: {
+          name: "NVIDIA NeMo Streaming Sortformer",
+          paradigm: "Causal Low-Latency Streaming Sortformer (Rolling Context Buffer)",
+          vad: "Causal frame-level joint segmentation",
+          embedding: "Rolling speaker context buffer (chunk size 0.5s–1.0s, history context 10s)",
+          clustering: "Dynamic speaker memory cache matching current frames to running speaker IDs",
+          strengths: "Highest single score in entire benchmark (99.83 in meetings). Achieves offline accuracy parity in real-time (~7.65s CPU runtime).",
+          tradeoffs: "Slight under-detection of low-volume speech on band-limited 8 kHz telephony channels."
+        },
+        5: {
+          name: "SpeechBrain AMI Diarization",
+          paradigm: "Pretrained ECAPA-TDNN + Spectral Clustering",
+          vad: "CRDNN / CNN-RNN acoustic VAD",
+          embedding: "ECAPA-TDNN 192-dimensional multi-head attention embeddings",
+          clustering: "Spectral clustering with maximum silhouette score",
+          strengths: "Solid multi-party meeting performance; strong channel and reverberation robustness.",
+          tradeoffs: "Heuristic clustering struggles with rapid sub-second overlapping speech turns."
+        },
+        6: {
+          name: "WeSpeaker Diarization",
+          paradigm: "ResNet34 / CAM++ Speaker Embeddings + Clustering",
+          vad: "FSMN-VAD acoustic segmenter",
+          embedding: "Context-Aware Masking (CAM++) 256-dim embeddings",
+          clustering: "Agglomerative / Spectral clustering",
+          strengths: "State-of-the-art speaker verification performance on VoxCeleb benchmarks.",
+          tradeoffs: "Requires fine-tuned post-processing thresholds to avoid speaker over-clustering."
+        },
+        7: {
+          name: "ESPnet (EEND-EDA)",
+          paradigm: "End-to-End Neural Diarization with Encoder-Decoder Attractors",
+          vad: "Native multi-speaker joint detection",
+          embedding: "Encoder-Decoder Attractor (EDA) state vectors",
+          clustering: "Permutation-Invariant Training (PIT) multi-label binary cross-entropy",
+          strengths: "Category champion on Real-Time Overlapping Transcriptions (94.14 Score, 20.50% DER). Overlap-aware attractors.",
+          tradeoffs: "High computational training cost; performance degrades on long-form audio beyond 10 minutes."
+        },
+        8: {
+          name: "Kaldi Diarization",
+          paradigm: "Classical Signal Processing: Energy VAD + x-vector PLDA + AHC",
+          vad: "Energy-based acoustic VAD",
+          embedding: "Time-delay neural network (TDNN) x-vectors",
+          clustering: "Probabilistic Linear Discriminant Analysis (PLDA) scoring with AHC",
+          strengths: "Historical benchmark standard; highly stable baseline on legacy telephony.",
+          tradeoffs: "Energy VAD fails in noise; cannot resolve overlapping speech turns; trailing modern neural models."
+        },
+        9: {
+          name: "Google UIS-RNN",
+          paradigm: "Unbounded Interleaved-State Recurrent Neural Network",
+          vad: "Pre-VAD frame-level segmentation",
+          embedding: "256-dim d-vectors",
+          clustering: "Online distance-dependent Chinese Restaurant Process (ddCRP) recurrent state transitions",
+          strengths: "Online streaming capability with unbounded dynamic speaker discovery.",
+          tradeoffs: "Greedy state transitions suffer from cluster drift during rapid back-and-forth turns."
+        },
+        10: {
+          name: "BUT-FIT VBx",
+          paradigm: "Variational Bayes HMM Clustering over Deep Embeddings",
+          vad: "Neural VAD (Silero/Kaldi)",
+          embedding: "ResNet101 deep x-vector embeddings",
+          clustering: "Variational Bayes Hidden Markov Model (VB-HMM) with PLDA prior",
+          strengths: "Category champion on Call Centre Telephony (80.31 Score). Bayesian temporal smoothing suppresses speaker confusion (2.10%).",
+          tradeoffs: "Requires pre-computed PLDA training matrices and careful acoustic channel adaptation."
+        }
+      }
+    };
+
+    // State
+    let activeCat = "general";
+    let activeSort = "score_desc";
+    let searchFilter = "";
+    let archFilter = "all";
+
+    // DOM
+    const tableBody = document.getElementById("table-body");
+    const kpiCatName = document.getElementById("kpi-category-name");
+    const kpiCatSub = document.getElementById("kpi-category-sub");
+    const kpiChampName = document.getElementById("kpi-champion-name");
+    const kpiChampMeta = document.getElementById("kpi-champion-meta");
+    const kpiTopScore = document.getElementById("kpi-top-score");
+    const kpiTopScoreMeta = document.getElementById("kpi-top-score-meta");
+    const wMissVal = document.getElementById("w-miss-val");
+    const wFaVal = document.getElementById("w-fa-val");
+    const wConfVal = document.getElementById("w-conf-val");
+    const searchInput = document.getElementById("filter-search");
+    const archSelect = document.getElementById("filter-arch-select");
+    const sortSelect = document.getElementById("sort-select");
+    const resetBtn = document.getElementById("btn-reset");
+    const drawerOverlay = document.getElementById("drawer-overlay");
+    const closeDrawerBtn = document.getElementById("btn-close-drawer");
+    const themeBtn = document.getElementById("theme-btn");
+
+    function init() {
+      setupHandlers();
+      render();
+    }
+
+    function setupHandlers() {
+      // Tabs
+      document.querySelectorAll(".segment-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".segment-tab").forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          activeCat = tab.dataset.category;
+          render();
+        });
+      });
+
+      // Search & Filters
+      searchInput.addEventListener("input", (e) => {
+        searchFilter = e.target.value.toLowerCase().trim();
+        render();
+      });
+
+      archSelect.addEventListener("change", (e) => {
+        archFilter = e.target.value;
+        render();
+      });
+
+      sortSelect.addEventListener("change", (e) => {
+        activeSort = e.target.value;
+        render();
+      });
+
+      resetBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchFilter = "";
+        archSelect.value = "all";
+        archFilter = "all";
+        sortSelect.value = "score_desc";
+        activeSort = "score_desc";
+        render();
+      });
+
+      // Drawer
+      closeDrawerBtn.addEventListener("click", closeDrawer);
+      drawerOverlay.addEventListener("click", (e) => {
+        if (e.target === drawerOverlay) closeDrawer();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDrawer();
+      });
+
+      // Theme
+      themeBtn.addEventListener("click", () => {
+        const isDark = document.body.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.body.removeAttribute("data-theme");
+          themeBtn.textContent = "🌙";
+        } else {
+          document.body.setAttribute("data-theme", "dark");
+          themeBtn.textContent = "☀️";
+        }
+      });
+    }
+
+    function render() {
+      const cat = MOCKUP_DATA.categories[activeCat];
+
+      // KPI Cards
+      kpiCatName.textContent = cat.name.replace(" Leaderboard", "");
+      kpiCatSub.textContent = cat.sub;
+      wMissVal.textContent = cat.weights.miss;
+      wFaVal.textContent = cat.weights.fa;
+      wConfVal.textContent = cat.weights.conf;
+
+      const champion = cat.models[0];
+      kpiChampName.textContent = champion.name;
+      kpiChampMeta.textContent = `Rank #1 • ${champion.paradigm}`;
+      kpiTopScore.textContent = `${champion.score.toFixed(2)} / 100`;
+      kpiTopScoreMeta.textContent = `DER: ${champion.der.toFixed(2)}% • Confusion: ${champion.conf.toFixed(2)}%`;
+
+      // Filter
+      let list = cat.models.filter(m => {
+        if (searchFilter) {
+          const matchName = m.name.toLowerCase().includes(searchFilter);
+          const matchParadigm = m.paradigm.toLowerCase().includes(searchFilter);
+          if (!matchName && !matchParadigm) return false;
+        }
+        if (archFilter !== "all" && m.arch !== archFilter) return false;
+        return true;
+      });
+
+      // Sort
+      list.sort((a, b) => {
+        switch (activeSort) {
+          case "score_desc": return b.score - a.score;
+          case "der_asc": return a.der - b.der;
+          case "jer_asc": return a.jer - b.jer;
+          case "miss_asc": return a.miss - b.miss;
+          case "fa_asc": return a.fa - b.fa;
+          case "conf_asc": return a.conf - b.conf;
+          default: return a.rank - b.rank;
+        }
+      });
+
+      // Table Render
+      tableBody.innerHTML = "";
+      if (list.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="9" class="text-center" style="padding: 2.5rem; color: var(--text-muted);">No models match your search or filter.</td></tr>`;
+        return;
+      }
+
+      list.forEach(m => {
+        const tr = document.createElement("tr");
+        if (m.rank === 1) tr.classList.add("rank-1-row");
+
+        let rankClass = "rank-cell";
+        if (m.rank === 1) rankClass += " gold";
+        else if (m.rank === 2) rankClass += " silver";
+        else if (m.rank === 3) rankClass += " bronze";
+
+        // Score Badge Tier
+        let tierBadge = "badge-std";
+        let tierLabel = "Standard";
+        if (m.score >= 95) { tierBadge = "badge-elite"; tierLabel = "Elite"; }
+        else if (m.score >= 90) { tierBadge = "badge-strong"; tierLabel = "High"; }
+        else if (m.score >= 75) { tierBadge = "badge-good"; tierLabel = "Good"; }
+
+        const scoreBarClass = m.rank === 1 ? "score-bar-fill fill-gold" : "score-bar-fill";
+        const scoreValClass = m.rank === 1 ? "score-val top-champion" : "score-val";
+
+        tr.innerHTML = `
+          <td class="text-center"><span class="${rankClass}">${m.rank}</span></td>
+          <td>
+            <div class="model-info-block">
+              <span class="model-name-text">${m.name}</span>
+              <div class="model-paradigm-tag">
+                <span class="paradigm-chip">${m.paradigm}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="score-composite">
+              <div class="score-header-row">
+                <span class="${scoreValClass}">${m.score.toFixed(2)}</span>
+                <span class="score-badge ${tierBadge}">${tierLabel}</span>
+              </div>
+              <div class="score-bar-track">
+                <div class="${scoreBarClass}" style="width: ${Math.min(100, m.score)}%;"></div>
+              </div>
+            </div>
+          </td>
+          <td class="text-right mono-num"><strong>${m.der.toFixed(2)}%</strong></td>
+          <td class="text-right mono-num">${m.jer.toFixed(2)}%</td>
+          <td class="text-right mono-num">${m.miss.toFixed(2)}%</td>
+          <td class="text-right mono-num">${m.fa.toFixed(2)}%</td>
+          <td class="text-right mono-num">${m.conf.toFixed(2)}%</td>
+          <td class="text-center">
+            <button class="btn-inspect-mini" data-id="${m.id}">Inspect</button>
+          </td>
+        `;
+
+        tr.addEventListener("click", (e) => {
+          if (!e.target.closest("button")) openDrawer(m.id, m);
+        });
+        tr.querySelector(".btn-inspect-mini").addEventListener("click", (e) => {
+          e.stopPropagation();
+          openDrawer(m.id, m);
+        });
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function openDrawer(modelId, currentMetrics) {
+      const details = MOCKUP_DATA.details[modelId];
+      if (!details) return;
+
+      document.getElementById("drawer-model-name").textContent = details.name;
+      document.getElementById("drawer-model-paradigm").textContent = details.paradigm;
+      document.getElementById("drawer-vad-text").textContent = details.vad;
+      document.getElementById("drawer-emb-text").textContent = details.embedding;
+      document.getElementById("drawer-cluster-text").textContent = details.clustering;
+      document.getElementById("drawer-strengths-text").textContent = details.strengths;
+      document.getElementById("drawer-tradeoffs-text").textContent = details.tradeoffs;
+
+      document.getElementById("drawer-score-val").textContent = currentMetrics.score.toFixed(2);
+      document.getElementById("drawer-der-val").textContent = `${currentMetrics.der.toFixed(2)}%`;
+      document.getElementById("drawer-jer-val").textContent = `${currentMetrics.jer.toFixed(2)}%`;
+      document.getElementById("drawer-rank-val").textContent = `#${currentMetrics.rank}`;
+
+      // Stacked Bar Calculation
+      const totalError = currentMetrics.miss + currentMetrics.fa + currentMetrics.conf;
+      let pMiss = 33, pFa = 33, pConf = 34;
+      if (totalError > 0) {
+        pMiss = (currentMetrics.miss / totalError) * 100;
+        pFa = (currentMetrics.fa / totalError) * 100;
+        pConf = (currentMetrics.conf / totalError) * 100;
+      }
+      document.getElementById("bar-seg-miss").style.width = `${pMiss}%`;
+      document.getElementById("bar-seg-fa").style.width = `${pFa}%`;
+      document.getElementById("bar-seg-conf").style.width = `${pConf}%`;
+
+      document.getElementById("lbl-seg-miss").textContent = `${currentMetrics.miss.toFixed(2)}% (${pMiss.toFixed(1)}%)`;
+      document.getElementById("lbl-seg-fa").textContent = `${currentMetrics.fa.toFixed(2)}% (${pFa.toFixed(1)}%)`;
+      document.getElementById("lbl-seg-conf").textContent = `${currentMetrics.conf.toFixed(2)}% (${pConf.toFixed(1)}%)`;
+
+      drawerOverlay.classList.add("active");
+    }
+
+    function closeDrawer() {
+      drawerOverlay.classList.remove("active");
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
