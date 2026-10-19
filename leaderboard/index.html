@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Arena — Speaker Diarization Benchmark Leaderboard</title>
+  <meta name="description" content="Production speaker diarization leaderboards comparing 10 models across call recordings, real-time transcription, and office meetings.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-badge">VA-2026</div>
+        <div>
+          <h1 class="brand-title">Voice Arena Diarization Benchmark</h1>
+          <p class="brand-subtitle">Josh Talks Production Speech Architecture Evaluation</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="../report/one-page-report.pdf" target="_blank" class="btn btn-secondary" id="btn-pdf-report">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Executive PDF Brief
+        </a>
+        <a href="../docs/methodology.md" target="_blank" class="btn btn-secondary" id="btn-methodology">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Methodology
+        </a>
+        <button id="theme-toggle" class="btn btn-icon" title="Toggle Dark/Light Mode">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Category Selector Tabs -->
+    <section class="category-tabs-container">
+      <div class="category-tabs" role="tablist">
+        <button class="tab-btn active" data-category="general" role="tab" id="tab-general">
+          <span class="tab-icon">🌐</span>
+          <span class="tab-label">General / All-Purpose</span>
+          <span class="tab-pill">4 Files</span>
+        </button>
+        <button class="tab-btn" data-category="call" role="tab" id="tab-call">
+          <span class="tab-icon">📞</span>
+          <span class="tab-label">Call Centre / Recordings</span>
+          <span class="tab-pill">8 kHz Mono</span>
+        </button>
+        <button class="tab-btn" data-category="realtime" role="tab" id="tab-realtime">
+          <span class="tab-icon">⚡</span>
+          <span class="tab-label">Real-Time Transcription</span>
+          <span class="tab-pill">High Overlap</span>
+        </button>
+        <button class="tab-btn" data-category="meeting" role="tab" id="tab-meeting">
+          <span class="tab-icon">👥</span>
+          <span class="tab-label">Office Room Meetings</span>
+          <span class="tab-pill">Multi-Speaker</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Category Header Card -->
+    <section class="category-meta-card">
+      <div class="meta-content">
+        <div class="meta-title-row">
+          <h2 id="current-category-title" class="category-title">General / All-Purpose Leaderboard</h2>
+          <span id="current-dataset-badge" class="badge badge-primary">Aggregate: 445.3s Speech</span>
+        </div>
+        <p id="current-category-desc" class="category-desc">
+          Holistic evaluation across all operational categories combining telephony, broadcast media, and formal presentation audio.
+        </p>
+      </div>
+      <div class="weights-box">
+        <span class="weights-label">Category Error Cost Weights:</span>
+        <div class="weights-tags">
+          <span class="w-tag">Miss: <strong id="w-miss">0.40</strong></span>
+          <span class="w-tag">FA: <strong id="w-fa">0.30</strong></span>
+          <span class="w-tag">Conf: <strong id="w-conf">0.30</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Controls Bar: Filter, Search, Status -->
+    <section class="controls-bar">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="model-search" placeholder="Search model name or architecture..." aria-label="Search models">
+      </div>
+      <div class="filter-group">
+        <label for="filter-status">Status:</label>
+        <select id="filter-status" class="select-input">
+          <option value="all">All Systems (10)</option>
+          <option value="measured">Measured Only (4)</option>
+          <option value="estimated">Estimated Only (6)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-arch">Architecture:</label>
+        <select id="filter-arch" class="select-input">
+          <option value="all">All Paradigms</option>
+          <option value="Sortformer">Self-Attention / Sortformer</option>
+          <option value="Clustering">Modular VAD + Clustering</option>
+          <option value="End-to-End">End-to-End Multi-Speaker</option>
+          <option value="Probabilistic">Probabilistic / HMM</option>
+        </select>
+      </div>
+      <button id="btn-reset-filters" class="btn btn-outline">Reset</button>
+    </section>
+
+    <!-- Leaderboard Table Card -->
+    <section class="table-card">
+      <div class="table-responsive">
+        <table class="leaderboard-table" id="leaderboard-table">
+          <thead>
+            <tr>
+              <th data-sort="rank" class="sortable text-center">Rank <span class="sort-indicator"></span></th>
+              <th data-sort="name" class="sortable">Model & Architecture <span class="sort-indicator"></span></th>
+              <th data-sort="status" class="sortable text-center">Evidence <span class="sort-indicator"></span></th>
+              <th data-sort="der" class="sortable text-right">DER % <span class="sort-indicator"></span></th>
+              <th data-sort="jer" class="sortable text-right">JER % <span class="sort-indicator"></span></th>
+              <th data-sort="miss" class="sortable text-right">Miss % <span class="sort-indicator"></span></th>
+              <th data-sort="fa" class="sortable text-right">FA % <span class="sort-indicator"></span></th>
+              <th data-sort="conf" class="sortable text-right">Confusion % <span class="sort-indicator"></span></th>
+              <th data-sort="score" class="sortable text-right active desc">Custom Score <span class="sort-indicator">▼</span></th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-tbody">
+            <!-- Dynamically Rendered by script.js -->
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer-note">
+        <span>💡 <strong>Tip:</strong> Click any row or <em>"Inspect"</em> to view complete architecture details, error breakdown, and production trade-offs.</span>
+        <span>Collar: <strong>0.25s</strong> | Hungarian Matching</span>
+      </div>
+    </section>
+
+    <!-- Scoring Explanation & Formula Accordion -->
+    <section class="accordion-card">
+      <details class="accordion" open>
+        <summary class="accordion-summary">
+          <div class="summary-title">
+            <span class="icon">📐</span>
+            <h3>Scoring Engine & Custom Score Formula</h3>
+          </div>
+          <span class="chevron">▾</span>
+        </summary>
+        <div class="accordion-content">
+          <div class="formula-grid">
+            <div class="formula-box">
+              <h4>Custom Score Definition</h4>
+              <div class="code-math">
+                Custom Score = 100.0 × max(0.0, 1.0 − Category-Weighted Error)
+              </div>
+              <p>Higher is better. Scores range from 0.00 to 100.00. 100 represents zero missed speech, zero false alarms, and zero speaker confusion.</p>
+            </div>
+            <div class="formula-box">
+              <h4>Category-Weighted Error (CWE)</h4>
+              <div class="code-math">
+                CWE = (w_miss · T_miss + w_fa · T_fa + w_conf · T_conf) / T_ref
+              </div>
+              <p>Standard DER applies equal cost to all errors. The Voice Arena Benchmark penalizes errors according to their actual business consequences.</p>
+            </div>
+          </div>
+          <div class="weights-explanation-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Miss Weight</th>
+                  <th>FA Weight</th>
+                  <th>Confusion Weight</th>
+                  <th>Operational Business Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Call Recordings</strong></td>
+                  <td>0.40</td>
+                  <td>0.25</td>
+                  <td>0.35</td>
+                  <td>Speaker confusion distorts QA compliance auditing; missed turns drop statutory disclosures.</td>
+                </tr>
+                <tr>
+                  <td><strong>Live Transcription</strong></td>
+                  <td>0.50</td>
+                  <td>0.20</td>
+                  <td>0.30</td>
+                  <td>Missed speech causes dropped words in downstream speech-to-text; real-time overlap is critical.</td>
+                </tr>
+                <tr>
+                  <td><strong>Office Meetings</strong></td>
+                  <td>0.45</td>
+                  <td>0.15</td>
+                  <td>0.40</td>
+                  <td>Speaker confusion scrambles action-item assignments and automated meeting minutes.</td>
+                </tr>
+                <tr>
+                  <td><strong>General Aggregate</strong></td>
+                  <td>0.40</td>
+                  <td>0.30</td>
+                  <td>0.30</td>
+                  <td>Balanced macro baseline across diverse acoustic conditions and conversation types.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Data Quality & call_input02 Notice Card -->
+    <section class="alert-card">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">
+        <h4>Data Quality Notice: call_input02 Timestamp Alignment</h4>
+        <p>
+          Reference annotations for <code>call_input02.flac</code> span 400.35s to 479.77s, while the physical recording duration is 120.00s. Because reference speech within the audio window is 0.00s, calculating DER results in an undefined 0/0 division. To ensure data integrity, <code>call_input02</code> is officially classified as <strong>INVALID_REFERENCE_DURATION</strong> and excluded from primary scoring. A &minus;400s diagnostic shift confirms expected model behavior.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Model Detail Modal / Drawer -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <div>
+          <span class="badge" id="modal-evidence-badge">Measured</span>
+          <h3 id="modal-title" class="modal-title">Model Details</h3>
+          <p id="modal-subtitle" class="modal-subtitle">Architecture & Benchmark Breakdown</p>
+        </div>
+        <button id="modal-close" class="btn-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>© 2026 Josh Talks Voice Arena Benchmark. All evaluation metrics computed via reproducible Python scoring scripts with Hungarian bipartite assignment and 0.25s collar.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
