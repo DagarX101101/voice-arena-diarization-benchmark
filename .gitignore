@@ -81,8 +81,6 @@ htmlcov/
 *~
 scratch/
 */scratch/
-upload/
-*/upload/
 *.zip
 .env
 .env.*
